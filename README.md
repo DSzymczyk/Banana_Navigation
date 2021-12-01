@@ -15,5 +15,8 @@
    - Test shows currently saved model in action.
    - Model is saved as `saved_model.pth` file.
    
+## Accreditation
+Dueling Double DQN algorithm was written based on `Grokking Deep Reinforcement Learning` by Miguel Morales. 
+   
 ## Trained model playthrough
 ![Alt Text](BananaNavigation.gif)
