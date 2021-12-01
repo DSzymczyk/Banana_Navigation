@@ -12,6 +12,11 @@ class Model(nn.Module):
         self.advantage_output = nn.Linear(64, action_size)
 
     def forward(self, state):
+        '''
+        Calculating scores for each action based by Dueling DQN. Argmax of this tensor is action picked by model.
+        :param state:
+        :return: Tensor with scores for each action.
+        '''
         x = F.relu(self.fc1(state))
         x = F.relu(self.fc2(x))
         v = self.value_output(x)

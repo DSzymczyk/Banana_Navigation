@@ -1,5 +1,4 @@
 from unityagents import UnityEnvironment
-import matplotlib.pyplot as plt
 
 from agent import Agent
 

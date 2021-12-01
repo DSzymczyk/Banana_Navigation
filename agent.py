@@ -46,6 +46,14 @@ class Agent:
         return f'Agent: [learning_rate={self._learning_rate}, gamma={self._gamma}, tau={self._tau}, eps: {self._start_eps}]'
 
     def step(self, state, action, reward, next_state, done):
+        '''
+            Add current step to replay buffer and learn every 4 steps
+            :param state: current state
+            :param action: current action
+            :param reward: current reward
+            :param next_state: next state
+            :param done: boolean flag if episode is done
+        '''
         self._step_count += 1
         self._replay_buffer.add(state, action, reward, next_state, done)
         self._step += 1
@@ -53,6 +61,13 @@ class Agent:
             self.learn()
 
     def choose_action(self, state, train=True):
+        '''
+        If train flag is set to True choose action in epsilon greedy policy otherwise choose best action selected by
+        agent.
+        :param state: current state
+        :param train: flag checking if epsilon greedy policy should be applied
+        :return: Action selected by agent
+        '''
         state = torch.from_numpy(state).float().unsqueeze(0).to(device)
         self._online_model.eval()
         with torch.no_grad():
@@ -64,6 +79,9 @@ class Agent:
         return np.argmax(action_values.cpu().data.numpy())
 
     def learn(self):
+        '''
+        Training model using Double DQN.
+        '''
         sample = self._replay_buffer.get_sample()
         if sample is None:
             return
@@ -86,8 +104,14 @@ class Agent:
         self.soft_update_target_model()
 
     def soft_update_target_model(self):
+        '''
+        Updating target model using Polyak averaging.
+        '''
         for target_param, local_param in zip(self._target_model.parameters(), self._online_model.parameters()):
             target_param.data.copy_(self._tau * local_param + (1 - self._tau) * target_param)
 
     def decrease_epsilon(self):
+        '''
+        Decrease epsilon by _eps_mul every function run. Minimal epsilon value is declared by _min_eps parameter.
+        '''
         self._eps = max(self._eps * self._eps_mul, self._min_eps)
