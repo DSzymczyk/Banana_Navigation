@@ -3,7 +3,6 @@ import random
 import numpy as np
 import torch
 from torch import optim
-import torch.nn.functional as F
 
 from ReplayBuffer import ReplayBuffer
 from model import Model
@@ -13,15 +12,15 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Agent:
 
-    def __init__(self, state_size, action_size, seed, model_path=None, learning_rate=5e-4, gamma=0.99, tau=1e-3,
+    def __init__(self, state_size, action_size, model_path=None, learning_rate=5e-4, gamma=0.99, tau=1e-3,
                  buffer_size=int(1e5), batch_size=64):
         self._state_size = state_size
         self._action_size = action_size
 
         self._replay_buffer = ReplayBuffer(buffer_size, batch_size)
 
-        self._online_model = Model(state_size, action_size, seed).to(device)
-        self._target_model = Model(state_size, action_size, seed).to(device)
+        self._online_model = Model(state_size, action_size).to(device)
+        self._target_model = Model(state_size, action_size).to(device)
         if model_path is not None:
             self._online_model.load_state_dict(torch.load(model_path))
             self._online_model.eval()
@@ -32,7 +31,8 @@ class Agent:
         self._learning_rate = learning_rate
         self._gamma = gamma
         self._tau = tau
-        self._eps = 1.0
+        self._start_eps = 0.5
+        self._eps = self._start_eps
         self._eps_mul = 0.995
         self._min_eps = 0.01
         self._step = 0
@@ -41,6 +41,9 @@ class Agent:
         self._act_count = 0
         self._learn_count = 0
         self._soft_update_target_model_count = 0
+
+    def __repr__(self):
+        return f'Agent: [learning_rate={self._learning_rate}, gamma={self._gamma}, tau={self._tau}, eps: {self._start_eps}]'
 
     def step(self, state, action, reward, next_state, done):
         self._step_count += 1
@@ -74,8 +77,8 @@ class Agent:
 
         q_values_estimates = self._online_model(states).gather(1, actions)
 
-        error = q_values_estimates - target_q_values
-        loss = error.pow(2).mul(0.5).mean()
+        loss = q_values_estimates - target_q_values
+        loss = loss.pow(2).mul(0.5).mean()
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
