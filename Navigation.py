@@ -12,7 +12,7 @@ action_size = brain.vector_action_space_size
 state = env_info.vector_observations[0]
 state_size = len(state)
 
-agent = Agent(state_size, action_size, model_path='saved_model.pth')
+agent = Agent(state_size, action_size, model_path='models/saved_model.pth')
 
 env_info = env.reset(train_mode=False)[brain_name]
 state = env_info.vector_observations[0]

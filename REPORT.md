@@ -1,13 +1,24 @@
 # Report
 Learning algorithm used to solve environment is Dueling Double DQN.
 
+Double DQN uses two estimators for calculations. First to select index of best action to take in current state and 
+second to get value of that action. This procedure is mitigating problem of overestimation. Normal DQN always select 
+max of estimated action values, which might be incorrect because estimated action values are often noisy. This leads to
+overestimation and lower performance.
+
+Dueling DQN is an improvement that applies only to the network architecture. Architecture contains two estimators. First
+estimator for calculating state-value function `V(s)` which contains only one node. Second estimator for calculating 
+action-advantage function `A(s, a)` which contains one node per action. All layers before split are shared by both 
+estimators. Output layer `Q function` has same number of nodes as action-advantage estimator. Output layer is merging 
+state-value function node and action-advantage function node for corresponding action.
+
 ### Adjustable hyper parameters in algorithm contains:  
-  - `learning rate` - learning rate for optimizer
-  - `gamma` - used for calculating q value 
-  - `tau` - used for updating target model
-  - `buffer size` - maximum size of replay buffer 
-  - `batch size` - size of batch used for training 
-  - `epsilon` - start value of epsilon used in epsilon greedy policy
+  - `learning rate` - learning rate for optimizer, determines step while minimizing loss function.
+  - `gamma` - discount value for rewards. Determines how much past rewards are valued. Used for calculating q value.
+  - `tau` - used for updating target model. Determines update rate from online model.
+  - `buffer size` - maximum size of replay buffer. Determines how many experiences are stored at once.
+  - `batch size` - size of batch used for training. Determines size of experiences batch used for learning.
+  - `epsilon` - start value of epsilon used in epsilon greedy policy.
 
 ### Adjusting hyper parameters
 Hyper parameters used during tests:

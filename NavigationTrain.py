@@ -44,7 +44,7 @@ for episode_number in range(1, episodes + 1):
         print("Episode: {} - Average: {:.2f}".format(episode_number, mean_score))
     if mean_score > 13:
         print(f'Finished in {episode_number - 100} episodes!')
-        torch.save(agent._online_model.state_dict(), 'saved_model.pth')
+        torch.save(agent._online_model.state_dict(), 'models/saved_model.pth')
         break
 
 env.close()
